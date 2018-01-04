@@ -2,7 +2,10 @@ const express = require("express");
 const app = express();
 const bodyParser = require("body-parser");
 const morgan = require("morgan");
+const cors = require("cors");
 
+
+app.use(cors());
 app.use(bodyParser.json());
 
 morgan.token("body", function getBody(req) {
@@ -44,10 +47,8 @@ app.delete("/api/persons/:id", (req, res) => {
 app.post("/api/persons", (req, res) => {
   const body = req.body;
 
-  if (body.name === undefined || body.number === undefined) {
+  if (!(body.name && body.number)) {
     res.status(400).json({error: "name and number required"});
-  } else if (persons.find((person) => person.name === body.name)) {
-    res.status(400).json({error: "name must be unique"});
   } else {
     const person = {
       name: body.name,
@@ -57,6 +58,19 @@ app.post("/api/persons", (req, res) => {
     persons = persons.concat(person);
     res.json(person);
   }
+});
+
+app.put("/api/persons/:id", (req, res) => {
+  const id = Number(req.params.id);
+  const body = req.body;
+
+  const updatedPerson = persons.find((person) => person.id === id);
+  updatedPerson.number = body.number;
+
+  persons = persons.filter((person) => person.id !== id);
+  persons = persons.concat(updatedPerson);
+
+  res.json(updatedPerson);
 });
 
 generateId = () => {
