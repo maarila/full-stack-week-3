@@ -33,19 +33,28 @@ app.delete("/api/persons/:id", (req, res) => {
 });
 
 app.post("/api/persons", (req, res) => {
-  const person = req.body;
-  person.id = generateId();
+  const body = req.body;
 
-  persons = persons.concat(person);
-
-  res.json(person);
+  if (body.name === undefined || body.number === undefined) {
+    res.status(400).json({error: "name and number required"});
+  } else if (persons.find((person) => person.name === body.name)) {
+    res.status(400).json({error: "name must be unique"});
+  } else {
+    const person = {
+      name: body.name,
+      number: body.number,
+      id: generateId()
+    };
+    persons = persons.concat(person);
+    res.json(person);
+  }
 });
 
 generateId = () => {
   const min = 1;
   const max = 10000000;
   return Math.floor(Math.random() * (max - min)) + min;
-}
+};
 
 const port = 3001;
 app.listen(port, () => {
