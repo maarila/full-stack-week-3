@@ -26,8 +26,12 @@ if (process.argv.length > 2) {
   });
 } else {
   Person.find({}).then((result) => {
+    const byName = (person1, person2) =>
+      person1.name.localeCompare(person2.name);
     console.log("puhelinluettelo:");
-    result.forEach((person) => console.log(`${person.name} ${person.number}`));
+    result
+      .sort(byName)
+      .forEach((person) => console.log(`${person.name}\t\t${person.number}`));
     mongoose.connection.close();
   });
 }
