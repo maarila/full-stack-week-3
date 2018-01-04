@@ -4,7 +4,6 @@ const bodyParser = require("body-parser");
 const morgan = require("morgan");
 const cors = require("cors");
 
-
 app.use(cors());
 app.use(bodyParser.json());
 
@@ -79,9 +78,9 @@ generateId = () => {
   return Math.floor(Math.random() * (max - min)) + min;
 };
 
-const port = 3001;
-app.listen(port, () => {
-  console.log(`Server running on port ${port}.`);
+const PORT = process.env.PORT || 3001;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}.`);
 });
 
 let persons = [
