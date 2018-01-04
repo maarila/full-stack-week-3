@@ -4,7 +4,14 @@ const bodyParser = require("body-parser");
 const morgan = require("morgan");
 
 app.use(bodyParser.json());
-app.use(morgan("tiny"));
+
+morgan.token("body", function getBody(req) {
+  return JSON.stringify(req.body);
+});
+
+app.use(
+  morgan(":method :url :body :status :res[content-length] - :response-time ms")
+);
 
 app.get("/info", (req, res) => {
   res.send(
