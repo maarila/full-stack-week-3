@@ -1,5 +1,15 @@
 const express = require("express");
 const app = express();
+const bodyParser = require("body-parser");
+
+app.use(bodyParser.json());
+
+app.get("/info", (req, res) => {
+  res.send(
+    `Puhelinluettelossa ${persons.length} henkilön tiedot.
+    <p>${req.date || new Date()}</p>`
+  );
+});
 
 app.get("/api/persons", (req, res) => {
   res.json(persons);
@@ -22,12 +32,20 @@ app.delete("/api/persons/:id", (req, res) => {
   res.status(204).end();
 });
 
-app.get("/info", (req, res) => {
-  res.send(
-    `Puhelinluettelossa ${persons.length} henkilön tiedot.
-    <p>${req.date || new Date()}</p>`
-  );
+app.post("/api/persons", (req, res) => {
+  const person = req.body;
+  person.id = generateId();
+
+  persons = persons.concat(person);
+
+  res.json(person);
 });
+
+generateId = () => {
+  const min = 1;
+  const max = 10000000;
+  return Math.floor(Math.random() * (max - min)) + min;
+}
 
 const port = 3001;
 app.listen(port, () => {
