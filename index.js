@@ -25,9 +25,13 @@ app.get("/info", (req, res) => {
 });
 
 app.get("/api/persons", (req, res) => {
-  Person.find({}).then((persons) => {
-    res.json(persons.map(formatPerson));
-  });
+  Person.find({})
+    .then((persons) => {
+      res.json(persons.map(formatPerson));
+    })
+    .catch((error) => {
+      console.log(error);
+    });
 });
 
 app.get("/api/persons/:id", (req, res) => {
@@ -53,13 +57,18 @@ app.post("/api/persons", (req, res) => {
   if (!(body.name && body.number)) {
     res.status(400).json({error: "name and number required"});
   } else {
-    const person = {
+    const person = new Person({
       name: body.name,
-      number: body.number,
-      id: generateId()
-    };
-    persons = persons.concat(person);
-    res.json(person);
+      number: body.number
+    });
+    person
+      .save()
+      .then((savedPerson) => {
+        res.json(formatPerson(savedPerson));
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   }
 });
 
