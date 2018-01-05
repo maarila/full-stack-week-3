@@ -3,6 +3,7 @@ const app = express();
 const bodyParser = require("body-parser");
 const morgan = require("morgan");
 const cors = require("cors");
+const Person = require("./models/person");
 
 app.use(express.static("build"));
 app.use(cors());
@@ -24,7 +25,9 @@ app.get("/info", (req, res) => {
 });
 
 app.get("/api/persons", (req, res) => {
-  res.json(persons);
+  Person.find({}).then((persons) => {
+    res.json(persons.map(formatPerson));
+  });
 });
 
 app.get("/api/persons/:id", (req, res) => {
@@ -72,6 +75,14 @@ app.put("/api/persons/:id", (req, res) => {
 
   res.json(updatedPerson);
 });
+
+const formatPerson = (person) => {
+  return {
+    name: person.name,
+    number: person.number,
+    id: person._id
+  };
+};
 
 generateId = () => {
   const min = 1;
