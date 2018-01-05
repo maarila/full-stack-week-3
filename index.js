@@ -18,10 +18,16 @@ app.use(
 );
 
 app.get("/info", (req, res) => {
-  res.send(
-    `Puhelinluettelossa ${persons.length} henkilön tiedot.
-    <p>${req.date || new Date()}</p>`
-  );
+  Person.count({})
+    .then((result) => {
+      res.send(
+        `Puhelinluettelossa ${result} henkilön tiedot.<p>${req.date ||
+          new Date()}</p>`
+      );
+    })
+    .catch((error) => {
+      console.log(error);
+    });
 });
 
 app.get("/api/persons", (req, res) => {
@@ -36,14 +42,18 @@ app.get("/api/persons", (req, res) => {
 });
 
 app.get("/api/persons/:id", (req, res) => {
-  const id = Number(req.params.id);
-  const person = persons.find((person) => person.id === id);
-
-  if (person) {
-    res.json(person);
-  } else {
-    res.status(404).end();
-  }
+  Person.findById(req.params.id)
+    .then((person) => {
+      if (person) {
+        res.json(formatPerson(person));
+      } else {
+        res.status(404).end();
+      }
+    })
+    .catch((error) => {
+      console.log(error);
+      res.status(400).send({error: "malformatted id"});
+    });
 });
 
 app.delete("/api/persons/:id", (req, res) => {
