@@ -72,18 +72,24 @@ app.post("/api/persons", (req, res) => {
   if (!(body.name && body.number)) {
     res.status(400).json({error: "name and number required"});
   } else {
-    const person = new Person({
-      name: body.name,
-      number: body.number
+    Person.findOne({name: body.name}).then((result) => {
+      if (result) {
+        res.status(400).send({error: "name already exists"});
+      } else {
+        const person = new Person({
+          name: body.name,
+          number: body.number
+        });
+        person
+          .save()
+          .then((savedPerson) => {
+            res.json(formatPerson(savedPerson));
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      }
     });
-    person
-      .save()
-      .then((savedPerson) => {
-        res.json(formatPerson(savedPerson));
-      })
-      .catch((error) => {
-        console.log(error);
-      });
   }
 });
 
