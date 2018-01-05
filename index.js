@@ -78,16 +78,21 @@ app.post("/api/persons", (req, res) => {
 });
 
 app.put("/api/persons/:id", (req, res) => {
-  const id = Number(req.params.id);
   const body = req.body;
 
-  const updatedPerson = persons.find((person) => person.id === id);
-  updatedPerson.number = body.number;
+  const updatedPerson = {
+    name: body.name,
+    number: body.number
+  };
 
-  persons = persons.filter((person) => person.id !== id);
-  persons = persons.concat(updatedPerson);
-
-  res.json(updatedPerson);
+  Person.findByIdAndUpdate(req.params.id, updatedPerson, {new: true})
+    .then((returnedPerson) => {
+      res.json(formatPerson(returnedPerson));
+    })
+    .catch((error) => {
+      console.log(error);
+      res.status(400).send({error: "malformatted id"});
+    });
 });
 
 const formatPerson = (person) => {
